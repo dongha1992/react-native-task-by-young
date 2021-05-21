@@ -1,19 +1,18 @@
 import React, {useState, useEffect} from 'react';
-import {View, Image, TouchableOpacity, Text, SafeAreaView} from 'react-native';
-import Network from '../libs/api';
+import {
+  View,
+  Image,
+  TouchableOpacity,
+  Text,
+  SafeAreaView,
+  StyleSheet,
+} from 'react-native';
+import {PostLists} from '../components/index';
 
 function HomeScreen() {
-  useEffect(() => {
-    getData();
-  }, []);
-
-  const getData = async () => {
-    const data = await Network.getAllPosts();
-    console.log(data, 'd');
-  };
   return (
     <SafeAreaView>
-      <Text>홈</Text>
+      <PostLists />
     </SafeAreaView>
   );
 }
