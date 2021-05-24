@@ -1,8 +1,12 @@
 import React from 'react';
-import {View, Image, TouchableOpacity, Text} from 'react-native';
+import {SafeAreaView} from 'react-native';
+import {FavoritePostLists} from '../components/index';
 
 function FavoriteScreen() {
-  return <Text> 즐겨찾기</Text>;
+  return (
+    <SafeAreaView>
+      <FavoritePostLists />
+    </SafeAreaView>
+  );
 }
-
 export default FavoriteScreen;

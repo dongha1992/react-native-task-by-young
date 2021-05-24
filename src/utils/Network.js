@@ -1,5 +1,28 @@
 import axios from 'axios';
 import {BASE_URL} from '../constants/config';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+// set local storage item
+export const setData = async value => {
+  try {
+    const list = JSON.stringify(value);
+    await AsyncStorage.setItem('favorite', list);
+  } catch (e) {
+    console.log(e);
+    // saving error
+  }
+};
+
+// get local stroage item
+export const getata = async () => {
+  try {
+    const list = await AsyncStorage.getItem('favorite');
+    return list !== null ? JSON.parse(list) : null;
+  } catch (e) {
+    console.log(e);
+    // error reading value
+  }
+};
 
 // get, delete
 const _sendRequest = async (url, params, method) => {

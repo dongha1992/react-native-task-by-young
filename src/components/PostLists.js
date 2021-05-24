@@ -8,14 +8,23 @@ import {
   ActivityIndicator,
   SafeAreaView,
   RefreshControl,
+  TouchableOpacity,
+  Alert,
 } from 'react-native';
-import {fetcherData, getPosts, initPage} from '../store/postsReducer';
+import {
+  fetcherData,
+  getPosts,
+  initPage,
+  setFavorite,
+} from '../store/postsReducer';
 import {useDispatch, useSelector} from 'react-redux';
 
 function PostLists() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const dispatch = useDispatch();
-  const {loading, paginatedPosts} = useSelector(state => state.posts);
+  const {loading, paginatedPosts, hashedFavoritedPosts} = useSelector(
+    state => state.posts,
+  );
 
   useEffect(() => {
     dispatch(fetcherData());
@@ -25,6 +34,7 @@ function PostLists() {
     dispatch(getPosts());
   };
 
+
   const handleRefresh = useCallback(() => {
     setIsRefreshing(true);
     dispatch(fetcherData());
@@ -32,16 +42,34 @@ function PostLists() {
     setIsRefreshing(false);
   }, [dispatch]);
 
+  const onPressHandler = item => {
+    dispatch(setFavorite(item));
+    Alert.alert('즐겨찾기에 추가되었습니다.');
+  };
+
   const renderItem = ({item}) => {
+    const isFavorite = hashedFavoritedPosts[item.id] ? true : false;
+
     return (
       <View style={styles.post}>
         <Text>name : {item.name}</Text>
         <Text>title : {item.title}</Text>
         <Text>url : {item.url}</Text>
         <Image source={{uri: item.thumbnailUrl}} style={styles.thumbnail} />
+        <TouchableOpacity>
+          <Text
+            style={styles.favorite}
+            onPress={() => {
+              if (isFavorite) return;
+              onPressHandler(item);
+            }}>
+            즐겨찾기{isFavorite ? '에 추가되었습니다.' : ' 추가하기'}
+          </Text>
+        </TouchableOpacity>
       </View>
     );
   };
+
   if (loading) {
     return (
       <View style={styles.Loading}>
@@ -81,7 +109,7 @@ const styles = StyleSheet.create({
   },
   post: {
     height: 100,
-    marginBottom: 90,
+    marginBottom: 110,
   },
   thumbnail: {
     height: '100%',
@@ -90,5 +118,8 @@ const styles = StyleSheet.create({
   Loading: {
     width: '100%',
     height: '100%',
+  },
+  favorite: {
+    fontSize: 20,
   },
 });

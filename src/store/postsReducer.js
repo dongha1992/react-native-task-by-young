@@ -1,10 +1,12 @@
-import {createSlice, createAsyncThunk} from '@reduxjs/toolkit';
+import {createSlice, createAsyncThunk, current} from '@reduxjs/toolkit';
 import {BASE_URL} from '../constants/config';
 import axios from 'axios';
 
 const initialState = {
   posts: [],
   paginatedPosts: [],
+  favoritePosts: [],
+  hashedFavoritedPosts: {},
   loading: false,
   error: null,
   limit: 10,
@@ -30,10 +32,24 @@ const postsSlice = createSlice({
     getPosts: (state, action) => {
       state.page = state.page + 1;
       state.paginatedPosts = state.posts.slice(0, state.limit * state.page);
-      console.log(state.page);
     },
     initPage: (state, action) => {
       state.page = 1;
+    },
+    setFavorite: (state, action) => {
+      state.favoritePosts.push(action.payload);
+      const hashed = state.favoritePosts.reduce((obj, cur) => {
+        obj[cur.id] = cur;
+        return obj;
+      }, {});
+      state.hashedFavoritedPosts = hashed;
+    },
+    removeFavorite: (state, action) => {
+      const filtered = state.favoritePosts.filter(
+        post => post.id !== action.payload.id,
+      );
+      state.favoritePosts = filtered;
+      delete state.hashedFavoritedPosts[action.payload.id];
     },
   },
   extraReducers: {
@@ -70,5 +86,6 @@ const postsSlice = createSlice({
   },
 });
 
-export const {getPosts, initPage} = postsSlice.actions;
+export const {getPosts, initPage, setFavorite, removeFavorite} =
+  postsSlice.actions;
 export default postsSlice.reducer;
