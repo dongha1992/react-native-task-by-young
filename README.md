@@ -14,6 +14,7 @@ pod version
 
 #### 구조
 
+`
 src
  ┣ components
  ┃ ┣ FavoritePostLists.js
@@ -37,6 +38,7 @@ src
  ┃ ┗ Network.js
 App.js
 index.js
+`
 
 #### 주요 기능 
 
