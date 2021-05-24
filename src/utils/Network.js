@@ -1,7 +1,6 @@
 import axios from 'axios';
 import {BASE_URL} from '../constants/config';
 
-
 // set local storage item
 
 // get, delete
