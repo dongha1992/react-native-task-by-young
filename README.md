@@ -36,7 +36,6 @@ src
  ┃ ┗ postsReducer.js // middleware + reducer + AsyncStorage
  ┗ utils
  ┃ ┗ Network.js
-
 `
 
 #### 주요 기능 
