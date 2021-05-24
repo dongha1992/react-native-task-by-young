@@ -16,24 +16,27 @@ import {
   getPosts,
   initPage,
   setFavorite,
+  getData,
 } from '../store/postsReducer';
+
 import {useDispatch, useSelector} from 'react-redux';
 
 function PostLists() {
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [hash, setHash] = useState({});
   const dispatch = useDispatch();
-  const {loading, paginatedPosts, hashedFavoritedPosts} = useSelector(
+  const {loading, paginatedPosts, favoritePosts} = useSelector(
     state => state.posts,
   );
 
   useEffect(() => {
     dispatch(fetcherData());
-  }, []);
+    getHashedStorageItems();
+  }, [favoritePosts, dispatch]);
 
   const fetchMoreData = () => {
     dispatch(getPosts());
   };
-
 
   const handleRefresh = useCallback(() => {
     setIsRefreshing(true);
@@ -47,11 +50,18 @@ function PostLists() {
     Alert.alert('즐겨찾기에 추가되었습니다.');
   };
 
+  const getHashedStorageItems = async () => {
+    const result = await getData('hash');
+    if (result !== null) {
+      setHash(result);
+    }
+  };
   const renderItem = ({item}) => {
-    const isFavorite = hashedFavoritedPosts[item.id] ? true : false;
+    const isFavorite = hash[item.id] ? true : false;
 
     return (
       <View style={styles.post}>
+        <Text>id: {item.id}</Text>
         <Text>name : {item.name}</Text>
         <Text>title : {item.title}</Text>
         <Text>url : {item.url}</Text>
@@ -109,7 +119,7 @@ const styles = StyleSheet.create({
   },
   post: {
     height: 100,
-    marginBottom: 110,
+    marginBottom: 130,
   },
   thumbnail: {
     height: '100%',

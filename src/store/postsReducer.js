@@ -1,6 +1,7 @@
-import {createSlice, createAsyncThunk, current} from '@reduxjs/toolkit';
+import {createSlice, createAsyncThunk} from '@reduxjs/toolkit';
 import {BASE_URL} from '../constants/config';
 import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const initialState = {
   posts: [],
@@ -25,6 +26,37 @@ export const fetcherData = createAsyncThunk('post/setData', async payload => {
   );
 });
 
+export const setData = async lists => {
+  try {
+    const value = await JSON.stringify(lists);
+    await AsyncStorage.setItem('favorite', value);
+  } catch (e) {
+    console.log(e);
+    // saving error
+  }
+};
+
+export const setHashItems = async lists => {
+  try {
+    const value = await JSON.stringify(lists);
+    await AsyncStorage.setItem('hash', value);
+  } catch (e) {
+    console.log(e);
+    // saving error
+  }
+};
+
+// get local stroage item
+export const getData = async key => {
+  try {
+    const value = await AsyncStorage.getItem(key);
+    return value !== null ? JSON.parse(value) : null;
+  } catch (e) {
+    console.log(e);
+    // error reading value
+  }
+};
+
 const postsSlice = createSlice({
   name: 'post',
   initialState,
@@ -38,10 +70,12 @@ const postsSlice = createSlice({
     },
     setFavorite: (state, action) => {
       state.favoritePosts.push(action.payload);
+      setData(state.favoritePosts);
       const hashed = state.favoritePosts.reduce((obj, cur) => {
         obj[cur.id] = cur;
         return obj;
       }, {});
+      setHashItems(hashed);
       state.hashedFavoritedPosts = hashed;
     },
     removeFavorite: (state, action) => {
@@ -49,7 +83,9 @@ const postsSlice = createSlice({
         post => post.id !== action.payload.id,
       );
       state.favoritePosts = filtered;
+      setData(filtered);
       delete state.hashedFavoritedPosts[action.payload.id];
+      setHashItems(state.hashedFavoritedPosts);
     },
   },
   extraReducers: {

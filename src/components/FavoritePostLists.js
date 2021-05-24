@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
   Image,
@@ -8,12 +8,25 @@ import {
   FlatList,
   SafeAreaView,
 } from 'react-native';
-import {removeFavorite} from '../store/postsReducer';
+import {removeFavorite, getData} from '../store/postsReducer';
+
 import {useDispatch, useSelector} from 'react-redux';
 
 function FavoritePostLists() {
   const {favoritePosts} = useSelector(state => state.posts);
+  const [posts, setPosts] = useState([]);
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    getStorageData();
+  }, [favoritePosts]);
+
+  const getStorageData = async () => {
+    const result = await getData('favorite');
+    if (result !== null) {
+      setPosts(result);
+    }
+  };
 
   const onPressHandler = item => {
     dispatch(removeFavorite(item));
@@ -22,6 +35,7 @@ function FavoritePostLists() {
   const renderItem = ({item}) => {
     return (
       <View style={styles.post}>
+        <Text>id: {item.id}</Text>
         <Text>name : {item.name}</Text>
         <Text>title : {item.title}</Text>
         <Text>url : {item.url}</Text>
@@ -43,7 +57,7 @@ function FavoritePostLists() {
     <SafeAreaView style={styles.container}>
       <Text>즐겨찾기 리스트</Text>
       <FlatList
-        data={favoritePosts}
+        data={posts}
         renderItem={renderItem}
         bounces={false}
         keyExtractor={item => item.id.toString()}
@@ -60,7 +74,7 @@ const styles = StyleSheet.create({
   },
   post: {
     height: 100,
-    marginBottom: 110,
+    marginBottom: 130,
   },
   thumbnail: {
     height: '100%',
