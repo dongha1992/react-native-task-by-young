@@ -1,32 +1,41 @@
 import axios from 'axios';
 import {BASE_URL} from '../constants/config';
 
-const instance = axios.create({
-  baseURL: BASE_URL,
-  timeout: 1000,
-});
+// get, delete
+const _sendRequest = async (url, params, method) => {
+  try {
+    const res = await axios[method](BASE_URL + url, {params});
 
-instance.interceptors.request.use(
-  function (config) {
-    return config;
-  },
-  function (error) {
-    return Promise.reject(error);
-  },
-);
+    if (res.status === 200) {
+      return res.data;
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
 
-instance.interceptors.response.use(
-  function (response) {
-    return response;
-  },
+// post, put
+const _sendRequestForData = async (url, data, method) => {
+  try {
+    const res = await axios[method](BASE_URL + url, data);
+    if (res.status === 200) {
+      return res.data;
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
 
-  function (error) {
-    return Promise.reject(error);
-  },
-);
+const _get = (url, params) => _sendRequest(url, params, 'get');
+
+const _post = (url, data) => _sendRequestForData(url, data, 'post');
+
+const _delete = (url, params) => _sendRequest(url, params, 'delete');
+
+const _put = (url, data) => _sendRequestForData(url, data, 'put');
 
 export const Network = {
-  getAllPosts: () => instance.get(`${BASE_URL}/posts`),
-  getAllUsers: () => instance.get(`${BASE_URL}/users`),
-  getAllAlbums: () => instance.get(`${BASE_URL}/albums`),
+  getAllPosts: () => _get(`${BASE_URL}/posts`),
+  getAllUsers: () => _get(`${BASE_URL}/users`),
+  getAllAlbums: () => _get(`${BASE_URL}/albums`),
 };

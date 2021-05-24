@@ -9,44 +9,40 @@ import {
   SafeAreaView,
   RefreshControl,
 } from 'react-native';
-import {fetcherData} from '../store/postsReducer';
+import {fetcherData, getPosts, initPage} from '../store/postsReducer';
 import {useDispatch, useSelector} from 'react-redux';
 
 function PostLists() {
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [page, setPage] = useState(1);
-
   const dispatch = useDispatch();
-  const {posts, loading} = useSelector(state => state.posts);
+  const {loading, paginatedPosts} = useSelector(state => state.posts);
 
   useEffect(() => {
-    dispatch(fetcherData(page));
-  }, [dispatch, page]);
+    dispatch(fetcherData());
+  }, []);
 
   const fetchMoreData = () => {
-    setPage(prev => prev + 1);
-    dispatch(fetcherData(page));
+    dispatch(getPosts());
   };
 
   const handleRefresh = useCallback(() => {
     setIsRefreshing(true);
-    setPage(1);
-    dispatch(fetcherData(page));
+    dispatch(fetcherData());
+    dispatch(initPage());
     setIsRefreshing(false);
-  }, [dispatch, page]);
+  }, [dispatch]);
 
   const renderItem = ({item}) => {
     return (
       <View style={styles.post}>
-        <Text>{item.name}</Text>
-        <Text>{item.title}</Text>
-        <Text>{item.url}</Text>
+        <Text>name : {item.name}</Text>
+        <Text>title : {item.title}</Text>
+        <Text>url : {item.url}</Text>
         <Image source={{uri: item.thumbnailUrl}} style={styles.thumbnail} />
       </View>
     );
   };
-
-  if (!posts.length) {
+  if (loading) {
     return (
       <View style={styles.Loading}>
         <ActivityIndicator />
@@ -57,7 +53,7 @@ function PostLists() {
     <SafeAreaView style={styles.container}>
       <Text>포스트 리스트</Text>
       <FlatList
-        data={posts}
+        data={paginatedPosts}
         renderItem={renderItem}
         bounces={false}
         keyExtractor={item => item.id.toString()}

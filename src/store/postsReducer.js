@@ -1,24 +1,21 @@
 import {createSlice, createAsyncThunk} from '@reduxjs/toolkit';
-import {GetUsers, GetPosts, GetPhotos} from '../services';
-import Network from '../utils/Network';
 import {BASE_URL} from '../constants/config';
 import axios from 'axios';
 
 const initialState = {
   posts: [],
+  paginatedPosts: [],
   loading: false,
   error: null,
+  limit: 10,
+  page: 1,
 };
 
 export const fetcherData = createAsyncThunk('post/setData', async payload => {
-  const LIMIT = 10;
-  console.log('middleware');
   return await Promise.all(
     ['users', 'posts', 'albums', 'photos'].map(endPoint => {
       try {
-        return axios
-          .get(`${BASE_URL}/${endPoint}?_page=1&_limit=${LIMIT * payload}`)
-          .then(res => res.data);
+        return axios.get(`${BASE_URL}/${endPoint}`).then(res => res.data);
       } catch (error) {
         console.log(error);
       }
@@ -29,7 +26,16 @@ export const fetcherData = createAsyncThunk('post/setData', async payload => {
 const postsSlice = createSlice({
   name: 'post',
   initialState,
-  reducers: {},
+  reducers: {
+    getPosts: (state, action) => {
+      state.page = state.page + 1;
+      state.paginatedPosts = state.posts.slice(0, state.limit * state.page);
+      console.log(state.page);
+    },
+    initPage: (state, action) => {
+      state.page = 1;
+    },
+  },
   extraReducers: {
     [fetcherData.fulfilled]: (state, action) => {
       let [users, posts, albums, photos] = action.payload;
@@ -44,7 +50,7 @@ const postsSlice = createSlice({
             post.albumId = album.id;
           }
         });
-        photos.forEach(photo => {
+        photos.slice(0, 500).forEach(photo => {
           if (post.albumId === photo.albumId) {
             post.thumbnailUrl = photo.thumbnailUrl;
             post.url = photo.url;
@@ -52,12 +58,17 @@ const postsSlice = createSlice({
         });
       });
       state.posts = posts;
+      state.paginatedPosts = posts.slice(0, state.limit);
+      state.loading = false;
+    },
+    [fetcherData.pending]: (state, action) => {
       state.loading = true;
     },
-    [fetcherData.pending]: (state, action) => {},
-    [fetcherData.rejected]: (state, action) => {},
+    [fetcherData.rejected]: (state, action) => {
+      state.loading = true;
+    },
   },
 });
 
-export const {setData, setUsers} = postsSlice.actions;
+export const {getPosts, initPage} = postsSlice.actions;
 export default postsSlice.reducer;
