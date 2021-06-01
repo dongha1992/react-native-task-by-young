@@ -13,12 +13,12 @@ function FavoritePostLists() {
     getStorageData();
   }, [favoritePosts]);
 
-  const getStorageData = async () => {
+  const getStorageData = useCallback(async () => {
     const result = await getData('favorite');
     if (result !== null) {
       setPosts(result);
     }
-  };
+  }, []);
 
   const onPressPostHandler = useCallback(
     item => {

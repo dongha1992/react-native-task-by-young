@@ -1,43 +1,25 @@
 import React, {useEffect, useState, useCallback} from 'react';
-import {
-  FlatList,
-  StyleSheet,
-  View,
-  Text,
-  Image,
-  ActivityIndicator,
-  SafeAreaView,
-  RefreshControl,
-  TouchableOpacity,
-  Alert,
-} from 'react-native';
-import {
-  fetcherData,
-  removeFavorite,
-  setFavorite,
-  getData,
-} from '../store/postsReducer';
+import {StyleSheet, SafeAreaView, Alert} from 'react-native';
+import {fetcherData, setFavorite} from '../store/postsReducer';
 
 import {useDispatch, useSelector} from 'react-redux';
 import RenderPostList from './RenderPostList';
 
 function PostLists() {
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [hash, setHash] = useState({});
   const [page, setPage] = useState(2);
 
   const dispatch = useDispatch();
-  const {posts, favoritePosts} = useSelector(state => state.posts);
+  const {posts} = useSelector(state => state.posts);
 
   useEffect(() => {
     dispatch(fetcherData());
-    getHashedStorageItems();
-  }, []);
+  }, [dispatch]);
 
   const fetchMoreData = useCallback(() => {
     setPage(page => page + 1);
     dispatch(fetcherData(page));
-  }, [dispatch, page]);
+  }, [page]);
 
   const handleRefresh = useCallback(() => {
     setIsRefreshing(true);
@@ -45,13 +27,6 @@ function PostLists() {
     dispatch(fetcherData());
     setIsRefreshing(false);
   }, [dispatch]);
-
-  const getHashedStorageItems = useCallback(async () => {
-    const result = await getData('hash');
-    if (result !== null) {
-      setHash(result);
-    }
-  }, []);
 
   const onPressPostHandler = useCallback(
     item => {
@@ -71,7 +46,7 @@ function PostLists() {
         onPressPostHandler={onPressPostHandler}
         handleRefresh={handleRefresh}
         fetchMoreData={fetchMoreData}
-        hash={hash}
+        isRefreshing={isRefreshing}
       />
     </SafeAreaView>
   );

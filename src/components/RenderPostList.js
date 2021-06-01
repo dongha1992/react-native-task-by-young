@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState, useEffect, useCallback} from 'react';
 import {
   FlatList,
   StyleSheet,
@@ -6,11 +6,11 @@ import {
   Text,
   Image,
   ActivityIndicator,
-  SafeAreaView,
   RefreshControl,
   TouchableOpacity,
-  Alert,
 } from 'react-native';
+import {getData} from '../store/postsReducer';
+import {useSelector} from 'react-redux';
 
 function RenderPostList({
   screenTitle,
@@ -19,11 +19,22 @@ function RenderPostList({
   onPressPostHandler,
   isRefreshing,
   handleRefresh,
-  hash,
 }) {
+  const [hash, setHash] = useState({});
+  const {favoritePosts} = useSelector(state => state.posts);
+  useEffect(() => {
+    getHashedStorageItems();
+  }, [favoritePosts]);
+
+  const getHashedStorageItems = useCallback(async () => {
+    const result = await getData('hash');
+    if (result !== null) {
+      setHash(result);
+    }
+  }, []);
+
   const renderItem = ({item}) => {
     const isFavorite = hash[item.id] ? true : false;
-    console.log(hash);
     return (
       <View style={styles.post}>
         <Text>id: {item.id}</Text>
@@ -53,6 +64,7 @@ function RenderPostList({
         onEndReached={fetchMoreData}
         onEndReachedThreshold={0}
         ListFooterComponent={() => {
+          if (screenTitle === '즐겨찾기') return null;
           return <ActivityIndicator size="large" />;
         }}
         refreshControl={
