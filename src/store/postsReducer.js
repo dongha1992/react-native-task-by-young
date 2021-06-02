@@ -53,7 +53,6 @@ export const getData = async key => {
     return value !== null ? JSON.parse(value) : null;
   } catch (e) {
     console.log(e);
-    // error reading value
   }
 };
 
