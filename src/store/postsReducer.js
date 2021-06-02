@@ -82,6 +82,7 @@ const postsSlice = createSlice({
       setHashItems(state.hashedFavoritedPosts);
     },
   },
+
   extraReducers: {
     [fetcherData.fulfilled]: (state, action) => {
       let [users, posts, albums, photos] = action.payload;
