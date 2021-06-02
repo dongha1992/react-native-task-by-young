@@ -9,8 +9,6 @@ import {
   RefreshControl,
   TouchableOpacity,
 } from 'react-native';
-import {getData} from '../store/postsReducer';
-import {useSelector} from 'react-redux';
 
 function RenderPostList({
   screenTitle,
@@ -19,22 +17,11 @@ function RenderPostList({
   onPressPostHandler,
   isRefreshing,
   handleRefresh,
+  hash,
 }) {
-  const [hash, setHash] = useState({});
-  const {favoritePosts} = useSelector(state => state.posts);
-  useEffect(() => {
-    getHashedStorageItems();
-  }, [favoritePosts]);
-
-  const getHashedStorageItems = useCallback(async () => {
-    const result = await getData('hash');
-    if (result !== null) {
-      setHash(result);
-    }
-  }, []);
-
+  console.log('render posts lists children');
+  let isFavorite = true;
   const renderItem = ({item}) => {
-    const isFavorite = hash[item.id] ? true : false;
     return (
       <View style={styles.post}>
         <Text>id: {item.id}</Text>
@@ -44,6 +31,7 @@ function RenderPostList({
         <Image source={{uri: item.thumbnailUrl}} style={styles.thumbnail} />
         <TouchableOpacity
           onPress={() => {
+            if (screenTitle === '포스트 리스트' && isFavorite) return;
             onPressPostHandler(item);
           }}>
           <Text style={styles.favorite}>
@@ -54,8 +42,8 @@ function RenderPostList({
     );
   };
   return (
-    <>
-      <Text>{screenTitle}</Text>
+    <View style={styles.container}>
+      <Text style={styles.title}>{screenTitle}</Text>
       <FlatList
         data={posts}
         renderItem={renderItem}
@@ -71,13 +59,20 @@ function RenderPostList({
           <RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} />
         }
       />
-    </>
+    </View>
   );
 }
 
 export default React.memo(RenderPostList);
 
 const styles = StyleSheet.create({
+  container: {
+    width: '100%',
+  },
+  title: {
+    fontSize: 20,
+    textAlign: 'center',
+  },
   post: {
     height: 100,
     marginBottom: 130,

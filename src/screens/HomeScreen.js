@@ -9,4 +9,4 @@ function HomeScreen() {
     </SafeAreaView>
   );
 }
-export default HomeScreen;
+export default React.memo(HomeScreen);

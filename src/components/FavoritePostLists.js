@@ -1,17 +1,16 @@
 import React, {useEffect, useState, useCallback} from 'react';
 import {StyleSheet, SafeAreaView} from 'react-native';
 import {removeFavorite, getData} from '../store/postsReducer';
-import {useDispatch, useSelector} from 'react-redux';
+import {useDispatch, useSelector, shallowEqual} from 'react-redux';
 import RenderPostList from './RenderPostList';
 
 function FavoritePostLists() {
-  const {favoritePosts} = useSelector(state => state.posts);
   const [posts, setPosts] = useState([]);
   const dispatch = useDispatch();
 
   useEffect(() => {
     getStorageData();
-  }, [favoritePosts]);
+  }, []);
 
   const getStorageData = useCallback(async () => {
     const result = await getData('favorite');
@@ -20,12 +19,11 @@ function FavoritePostLists() {
     }
   }, []);
 
-  const onPressPostHandler = useCallback(
-    item => {
-      dispatch(removeFavorite(item));
-    },
-    [dispatch],
-  );
+  const onPressPostHandler = useCallback(item => {
+    dispatch(removeFavorite(item));
+  }, []);
+
+  console.log('render favorite lists');
 
   return (
     <SafeAreaView style={styles.container}>
@@ -37,12 +35,13 @@ function FavoritePostLists() {
     </SafeAreaView>
   );
 }
-export default FavoritePostLists;
+
+export default React.memo(FavoritePostLists);
 
 const styles = StyleSheet.create({
   container: {
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 10,
+    paddingHorizontal: 14,
   },
 });

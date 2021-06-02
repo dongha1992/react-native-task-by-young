@@ -1,8 +1,8 @@
 import React, {useEffect, useState, useCallback} from 'react';
 import {StyleSheet, SafeAreaView, Alert} from 'react-native';
-import {fetcherData, setFavorite} from '../store/postsReducer';
+import {fetcherData, setFavorite, getData} from '../store/postsReducer';
 
-import {useDispatch, useSelector} from 'react-redux';
+import {useDispatch, useSelector, shallowEqual} from 'react-redux';
 import RenderPostList from './RenderPostList';
 
 function PostLists() {
@@ -10,7 +10,7 @@ function PostLists() {
   const [page, setPage] = useState(2);
 
   const dispatch = useDispatch();
-  const {posts} = useSelector(state => state.posts);
+  const {posts} = useSelector(state => state.posts, shallowEqual);
 
   useEffect(() => {
     dispatch(fetcherData());
@@ -36,6 +36,7 @@ function PostLists() {
     [dispatch],
   );
 
+  console.log('render post lists');
   console.log(posts);
 
   return (
@@ -58,6 +59,6 @@ const styles = StyleSheet.create({
   container: {
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 10,
+    paddingHorizontal: 14,
   },
 });
