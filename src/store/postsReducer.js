@@ -85,7 +85,6 @@ const postsSlice = createSlice({
   extraReducers: {
     [fetcherData.fulfilled]: (state, action) => {
       let [users, posts, albums, photos] = action.payload;
-
       posts.forEach(post => {
         users.forEach(user => {
           if (post.userId === user.id) {
