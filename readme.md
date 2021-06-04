@@ -42,6 +42,14 @@ index.js
 
 #### 주요 기능
 
+### YOUNG 리뷰 이후 (06.04)
+
+- 디렉토리 구조 변화 -> component 하나로 즐겨찾기/포스트 둘 다 리스트 렌더
+- limit/offset으로 서버통신
+- 최적화 최대한 노력...
+- 변수명 일부 변경
+- 즐겨찾기 추가 시 리렌더링은 Loading 분기를 잘못해서 된 거였음!
+
 ### infinite scroll
 
 - PostLists 컴포넌트가 렌더되면 postsReducer에서 middleware로 'users', 'posts', 'albums', 'photos'에 해당하는 데이터를 받아서 reducer에서 가공
@@ -56,3 +64,5 @@ index.js
 ### AsyncStorage
 
 - reducer 파일에서 관리
+
+

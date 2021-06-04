@@ -26,7 +26,7 @@ export const fetcherData = createAsyncThunk('post/setData', async payload => {
   );
 });
 
-export const setData = async lists => {
+export const setFavoritePostInLocalStorage = async lists => {
   try {
     const value = await JSON.stringify(lists);
     await AsyncStorage.setItem('favorite', value);
@@ -36,7 +36,7 @@ export const setData = async lists => {
   }
 };
 
-export const setHashItems = async lists => {
+export const setHashedFavoritePostIdInLocalStorage = async lists => {
   try {
     const value = await JSON.stringify(lists);
     await AsyncStorage.setItem('hash', value);
@@ -47,7 +47,7 @@ export const setHashItems = async lists => {
 };
 
 // get local stroage item
-export const getData = async key => {
+export const getDataInLocalStorage = async key => {
   try {
     const value = await AsyncStorage.getItem(key);
     return value !== null ? JSON.parse(value) : null;
@@ -61,25 +61,26 @@ const postsSlice = createSlice({
   name: 'post',
   initialState,
   reducers: {
-    setFavorite: (state, action) => {
-      state.favoritePosts.push(action.payload);
-      setData(state.favoritePosts);
+    setFavoritePost: (state, action) => {
+      state.favoritePosts.push({...action.payload, isFavorite: true});
+      setFavoritePostInLocalStorage(state.favoritePosts);
+
       const hashed = state.favoritePosts.reduce((obj, cur) => {
         obj[cur.id] = cur;
         return obj;
       }, {});
-      setHashItems(hashed);
+      setHashedFavoritePostIdInLocalStorage(hashed);
       state.hashedFavoritedPosts = hashed;
     },
 
-    removeFavorite: (state, action) => {
+    removeFavoritePost: (state, action) => {
       const filtered = state.favoritePosts.filter(
         post => post.id !== action.payload.id,
       );
       state.favoritePosts = filtered;
-      setData(filtered);
+      setFavoritePostInLocalStorage(filtered);
       delete state.hashedFavoritedPosts[action.payload.id];
-      setHashItems(state.hashedFavoritedPosts);
+      setHashedFavoritePostIdInLocalStorage(state.hashedFavoritedPosts);
     },
   },
 
@@ -116,6 +117,6 @@ const postsSlice = createSlice({
   },
 });
 
-export const {getPosts, initPage, setFavorite, removeFavorite} =
+export const {getPosts, initPage, setFavoritePost, removeFavoritePost} =
   postsSlice.actions;
 export default postsSlice.reducer;

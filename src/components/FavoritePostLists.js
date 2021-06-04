@@ -1,29 +1,29 @@
 import React, {useEffect, useState, useCallback} from 'react';
 import {StyleSheet, SafeAreaView} from 'react-native';
-import {removeFavorite, getData} from '../store/postsReducer';
-import {useDispatch, useSelector, shallowEqual} from 'react-redux';
+import {removeFavoritePost, getDataInLocalStorage} from '../store/postsReducer';
+import {useDispatch, useSelector} from 'react-redux';
 import RenderPostList from './RenderPostList';
 
 function FavoritePostLists() {
   const [posts, setPosts] = useState([]);
+
   const dispatch = useDispatch();
+  const {favoritePosts} = useSelector(state => state.posts);
 
   useEffect(() => {
     getStorageData();
-  }, []);
+  }, [favoritePosts]);
 
   const getStorageData = useCallback(async () => {
-    const result = await getData('favorite');
+    const result = await getDataInLocalStorage('favorite');
     if (result !== null) {
       setPosts(result);
     }
   }, []);
 
   const onPressPostHandler = useCallback(item => {
-    dispatch(removeFavorite(item));
+    dispatch(removeFavoritePost(item));
   }, []);
-
-  console.log('render favorite lists');
 
   return (
     <SafeAreaView style={styles.container}>

@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useCallback} from 'react';
+import React from 'react';
 import {
   FlatList,
   StyleSheet,
@@ -17,10 +17,7 @@ function RenderPostList({
   onPressPostHandler,
   isRefreshing,
   handleRefresh,
-  hash,
 }) {
-  console.log('render posts lists children');
-  let isFavorite = true;
   const renderItem = ({item}) => {
     return (
       <View style={styles.post}>
@@ -31,11 +28,11 @@ function RenderPostList({
         <Image source={{uri: item.thumbnailUrl}} style={styles.thumbnail} />
         <TouchableOpacity
           onPress={() => {
-            if (screenTitle === '포스트 리스트' && isFavorite) return;
+            if (screenTitle === '포스트 리스트' && item.isFavorite) return;
             onPressPostHandler(item);
           }}>
           <Text style={styles.favorite}>
-            즐겨찾기{isFavorite ? '에 추가되었습니다.' : ' 추가하기'}
+            즐겨찾기{item.isFavorite ? '에 추가되었습니다.' : ' 추가하기'}
           </Text>
         </TouchableOpacity>
       </View>
